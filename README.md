@@ -57,7 +57,7 @@ This setting determines the [hash function](https://github.com/JohannesBuchner/i
 | Hash function          | Reference                                                                       | Setting name                |
 | ---------------------- | ------------------------------------------------------------------------------- | --------------------------- |
 | Average hashing        | http://www.hackerfactor.com/blog/index.php?/archives/432-Looks-Like-It.html     | `average_hash`              |
-| Perceptual hashing     | http://www.hackerfactor.com/blog/index.php?/archives/432-Looks-Like-It.html     | `phash` (default)           |
+| Perceptual hashing     | http://www.hackerfactor.com/blog/index.php?/archives/432-Looks-Like-It.html     | `phash` (_default_)         |
 | Difference hashing     | http://www.hackerfactor.com/blog/index.php?/archives/529-Kind-of-Like-That.html | `dhash` or `dhash_vertical` |
 | Wavelet hashing        | https://fullstackml.com/2016/07/02/wavelet-image-hash-in-python/                | `whash`                     |
 | HSV color hashing      |                                                                                 | `colorhash`                 |
@@ -65,4 +65,7 @@ This setting determines the [hash function](https://github.com/JohannesBuchner/i
 
 ### `WAGTAILIMAGESDEDUPLICATOR_MAX_DISTANCE_THRESOLD`
 
-This setting determines the maximum distance between 2 images to consider them as duplicates. The default value is **5**.
+This setting determines the maximum distance between 2 images to consider them as duplicates.  
+The default value is **5**.
+
+To help you assess how these different algorithms behave and to learn more about hash distances, check out the [examples section](https://github.com/JohannesBuchner/imagehash#examples) of the imagehash library's README.
