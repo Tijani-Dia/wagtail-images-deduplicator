@@ -1,3 +1,4 @@
+from functools import wraps
 from io import BytesIO
 
 import PIL.Image
@@ -14,3 +15,26 @@ def get_test_images_files():
         image.save(f, "PNG")
         f.seek(0)
         yield File(f, name=f"image-{i}.png")
+
+
+class clear_function_cache_before_and_after_test:
+    def __init__(self, cached_func):
+        self.cached_func = cached_func
+
+    def __call__(self, func):
+        @wraps(func)
+        def wrapper(*args, **kwargs):
+            self.cached_func.cache_clear()
+            exception = None
+
+            try:
+                func(*args, **kwargs)
+            except Exception as e:
+                exception = e
+            finally:
+                self.cached_func.cache_clear()
+
+            if exception:
+                raise exception
+
+        return wrapper

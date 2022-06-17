@@ -27,10 +27,9 @@ def get_max_distance_thresold():
     )
     try:
         return int(max_distance_thresold)
-    except TypeError:
+    except (TypeError, ValueError):
         raise ImproperlyConfigured(
-            "The 'WAGTAILIMAGESDEDUPLICATOR_MAX_DISTANCE_THRESOLD' setting value must be a string or a number, "
-            f"not '{type(max_distance_thresold)}'"
+            "The 'WAGTAILIMAGESDEDUPLICATOR_MAX_DISTANCE_THRESOLD' setting value must be a number."
         )
 
 
