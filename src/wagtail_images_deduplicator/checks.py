@@ -16,7 +16,7 @@ def check_image_model(app_configs, **kwargs):
                     "wagtail_images_deduplicator.models.DuplicateFindingMixin."
                 ),
                 obj=ImageModel,
-                id="wagtail_images_deduplicator.E001",
+                id="wagtail_images_deduplicator.W001",
             )
         )
     return warnings
