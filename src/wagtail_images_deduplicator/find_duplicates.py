@@ -9,7 +9,7 @@ def is_image_duplicate(image_hash, other_image_hash):
     return True if distance < get_max_distance_thresold() else False
 
 
-def find_image_duplicates(image, user, permission_policy):
+def find_image_duplicates(image, user, permission_policy, first_only=True):
     instances = permission_policy.instances_user_has_permission_for(
         user, "choose"
     ).exclude(pk=image.pk)
@@ -19,13 +19,11 @@ def find_image_duplicates(image, user, permission_policy):
 
     # Try to shortcut by finding exact duplicates (if any).
     if custom_hash:
+        filters = Q(custom_hash=custom_hash)
         if file_hash:
-            duplicates = instances.filter(
-                Q(file_hash=file_hash) | Q(custom_hash=custom_hash)
-            )
-        else:
-            duplicates = instances.filter(custom_hash=custom_hash)
+            filters |= Q(file_hash=file_hash)
 
+        duplicates = instances.filter(filters)
         if duplicates:
             return duplicates
 
@@ -40,11 +38,14 @@ def find_image_duplicates(image, user, permission_policy):
     # We haven't found any exact duplicates at this point but the image's custom hash is set.
     # Let's find the near duplicates (if any).
     image_hash = image.hash_instance
-    duplicates = (
-        instance.pk
-        for instance in instances.exclude(custom_hash="")
-        .only("pk", "custom_hash")
-        .iterator()
-        if is_image_duplicate(image_hash, instance.hash_instance)
-    )
+
+    qs = instances.exclude(custom_hash="").only("pk", "custom_hash").iterator()
+    duplicates = []
+    for instance in qs:
+        if is_image_duplicate(image_hash, instance.hash_instance):
+            if first_only:
+                return instances.filter(pk__in=[instance.pk])
+            else:
+                duplicates.append(instance.pk)
+
     return instances.filter(pk__in=duplicates)

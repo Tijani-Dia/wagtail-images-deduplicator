@@ -22,8 +22,10 @@ class TestFindDuplicates(TestCase):
         CustomImage.objects.all().delete()
         rmtree("original_images")
 
-    def find_duplicates(self, image):
-        duplicates = find_image_duplicates(image, self.user, permission_policy)
+    def find_duplicates(self, image, first_only=False):
+        duplicates = find_image_duplicates(
+            image, self.user, permission_policy, first_only
+        )
         if duplicates._result_cache is None:
             return duplicates.order_by("pk").values_list("pk", flat=True)
         return [duplicate.pk for duplicate in duplicates._result_cache]
@@ -55,6 +57,23 @@ class TestFindDuplicates(TestCase):
                 with self.assertNumQueries(3):
                     self.assertQuerysetEqual(
                         self.find_duplicates(self.images[i - 1]), duplicates_expected
+                    )
+
+    def test_find_image_duplicates_first_only(self):
+        duplicates = {
+            1: [2],
+            2: [1],
+            3: [2],
+            4: [3],
+            5: [3],
+        }
+
+        for i, duplicates_expected in duplicates.items():
+            with self.subTest(i=i):
+                with self.assertNumQueries(3):
+                    self.assertQuerysetEqual(
+                        self.find_duplicates(self.images[i - 1], first_only=True),
+                        duplicates_expected,
                     )
 
     def test_find_image_duplicates_without_hashes(self):
