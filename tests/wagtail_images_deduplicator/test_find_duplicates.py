@@ -11,16 +11,20 @@ from wagtail_images_deduplicator.models import DuplicateFindingMixin
 
 
 class TestFindDuplicates(TestCase):
-    def setUp(self):
-        self.user = get_user_model().objects.create_superuser("admin")
-        self.images = []
+    @classmethod
+    def setUpTestData(cls):
+        cls.user = get_user_model().objects.create_superuser("admin")
+        cls.images = []
         for num, _file in enumerate(get_test_images_files()):
             image = CustomImage.objects.create(title=f"Image {num + 1}", file=_file)
-            self.images.append(image)
+            cls.images.append(image)
 
-    def tearDown(self):
+    @classmethod
+    def tearDownClass(cls):
         CustomImage.objects.all().delete()
         rmtree("original_images")
+
+        return super().tearDownClass()
 
     def find_duplicates(self, image, first_only=False):
         duplicates = find_image_duplicates(
