@@ -1,0 +1,9 @@
+[tool.pyright]
+include = ["src"]
+strict = ["src"]
+exclude = ["**/migrations", "**/__pycache__"]
+extraPaths = ["./venv/lib/python3.10/site-packages/"] # So pyright can load imports on CI
+ignore = ["tests"]
+
+pythonVersion = "3.10"
+pythonPlatform = "Linux"
