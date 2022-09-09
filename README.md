@@ -20,33 +20,33 @@ pip install wagtail-images-deduplicator
 
 - Add the `DuplicateFindingMixin` to your [custom image model](https://docs.wagtail.org/en/latest/advanced_topics/images/custom_image_model.html). An example of doing it is shown below:
 
-  ```python
-  from wagtail.images.models import Image, AbstractImage, AbstractRendition
+```python
+from wagtail.images.models import Image, AbstractImage, AbstractRendition
 
-  from wagtail_images_deduplicator.models import DuplicateFindingMixin
-
-
-  class CustomImage(DuplicateFindingMixin, AbstractImage):
-      admin_form_fields = Image.admin_form_fields
+from wagtail_images_deduplicator.models import DuplicateFindingMixin
 
 
-  class CustomRendition(AbstractRendition):
-      image = models.ForeignKey(
-          CustomImage, on_delete=models.CASCADE, related_name="renditions"
-      )
+class CustomImage(DuplicateFindingMixin, AbstractImage):
+    admin_form_fields = Image.admin_form_fields
 
-      class Meta:
-          unique_together = (("image", "filter_spec", "focal_point_key"),)
-  ```
 
-  If you choose to add the mixin and have existing image data, you will need to call `save()` on all existing instances to fill in the new hash value:
+class CustomRendition(AbstractRendition):
+    image = models.ForeignKey(
+        CustomImage, on_delete=models.CASCADE, related_name="renditions"
+    )
 
-  ```bash
-  from wagtail.images import get_image_model
+    class Meta:
+        unique_together = (("image", "filter_spec", "focal_point_key"),)
+```
 
-  for image in get_image_model().objects.all():
-      image.save()
-  ```
+If you choose to add the mixin and have existing image data, you will need to call `save()` on all existing instances to fill in the new hash value:
+
+```bash
+from wagtail.images import get_image_model
+
+for image in get_image_model().objects.all():
+    image.save()
+```
 
 ## Settings
 
