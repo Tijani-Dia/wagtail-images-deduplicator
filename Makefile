@@ -1,20 +1,22 @@
-default: clean
+default: format
 
-clean:
-	find . -name '*.pyc' -exec rm -rf {} +
-	find . -name '__pycache__' -exec rm -rf {} +
-	find . -name '*.egg-info' -exec rm -rf {} +
-	rm -rf dist/ build/ .pytest_cache/
+SRC_FILES = src/wagtail_images_deduplicator tests setup.py
 
 format:
-	isort src/wagtail_images_deduplicator tests setup.py
-	black src/wagtail_images_deduplicator tests setup.py
-	flake8 src/wagtail_images_deduplicator tests setup.py
+	isort $(SRC_FILES)
+	black $(SRC_FILES)
+	flake8 $(SRC_FILES)
 
 lint:
-	isort --check-only --diff src/wagtail_images_deduplicator tests setup.py
-	black --check --diff src/wagtail_images_deduplicator tests setup.py
-	flake8 src/wagtail_images_deduplicator tests setup.py
+	isort --check-only --diff $(SRC_FILES)
+	black --check --diff $(SRC_FILES)
+	flake8 $(SRC_FILES)
 
 test:
 	pytest --cov wagtail_images_deduplicator
+
+clean:
+	rm -rf dist/ build/ .pytest_cache/ .tox/ images/
+	find . -name '*.pyc' -exec rm -rf {} +
+	find . -name '__pycache__' -exec rm -rf {} +
+	find . -name '*.egg-info' -exec rm -rf {} +

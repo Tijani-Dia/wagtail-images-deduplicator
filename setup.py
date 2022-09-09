@@ -1,6 +1,6 @@
 from setuptools import find_packages, setup
 
-from src.wagtail_images_deduplicator import __version__
+__version__ = "1.0a1"
 
 with open("README.md", "r") as fh:
     long_description = fh.read()
@@ -10,7 +10,15 @@ install_requires = [
     "imagehash",
 ]
 
-test_requires = ["pytest", "pytest-cov", "pytest-django", "black", "isort", "flake8"]
+test_requires = [
+    "pytest",
+    "pytest-cov",
+    "pytest-django",
+    "black",
+    "isort",
+    "flake8",
+    "dj-database-url",
+]
 
 build_requires = [
     "twine",
