@@ -1,6 +1,7 @@
 import json
 from shutil import rmtree
 
+import wagtail
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Group, Permission
 from django.core.files.uploadedfile import SimpleUploadedFile
@@ -10,6 +11,8 @@ from django.utils.http import urlencode
 from wagtail.images import get_image_model
 from wagtail.images.tests.utils import get_test_image_file
 from wagtail.models import Collection, GroupCollectionPermission, get_root_collection_id
+
+WAGTAIL_VERSION = int(wagtail.__version__[0])
 
 
 class TestDuplicateImageViews(TestCase):
@@ -45,8 +48,13 @@ class TestDuplicateImageViews(TestCase):
 
     def upload_image(self, title="Test image", select_format=False):
         params = "?select_format=true" if select_format else ""
+        chooser_upload_url = (
+            "wagtailimages_chooser:create"
+            if WAGTAIL_VERSION >= 4
+            else "wagtailimages:chooser_upload"
+        )
         return self.client.post(
-            reverse("wagtailimages:chooser_upload") + params,
+            reverse(chooser_upload_url) + params,
             {
                 "image-chooser-upload-title": title,
                 "image-chooser-upload-file": SimpleUploadedFile(
@@ -150,9 +158,12 @@ class TestDuplicateImageViews(TestCase):
         self.assertEqual(response.context["new_image"], new_image)
         self.assertEqual(response.context["existing_image"], existing_image)
 
-        choose_new_image_action = reverse(
-            "wagtailimages:image_chosen", args=(new_image.id,)
+        choose_new_image_url = (
+            "wagtailimages_chooser:chosen"
+            if WAGTAIL_VERSION >= 4
+            else "wagtailimages:image_chosen"
         )
+        choose_new_image_action = reverse(choose_new_image_url, args=(new_image.id,))
         self.assertEqual(
             response.context["confirm_duplicate_upload_action"], choose_new_image_action
         )
@@ -161,11 +172,7 @@ class TestDuplicateImageViews(TestCase):
             reverse("wagtailimages:delete", args=(new_image.id,))
             + "?"
             + urlencode(
-                {
-                    "next": reverse(
-                        "wagtailimages:image_chosen", args=(existing_image.id,)
-                    )
-                }
+                {"next": reverse(choose_new_image_url, args=(existing_image.id,))}
             )
         )
         self.assertEqual(
@@ -190,9 +197,12 @@ class TestDuplicateImageViews(TestCase):
         new_image = Image.objects.get(title="Test duplicate image")
         existing_image = Image.objects.get(title="Test image")
 
-        choose_new_image_action = reverse(
-            "wagtailimages:chooser_select_format", args=(new_image.id,)
+        choose_new_image_url = (
+            "wagtailimages_chooser:select_format"
+            if WAGTAIL_VERSION >= 4
+            else "wagtailimages:chooser_select_format"
         )
+        choose_new_image_action = reverse(choose_new_image_url, args=(new_image.id,))
         self.assertEqual(
             response.context["confirm_duplicate_upload_action"], choose_new_image_action
         )
@@ -201,11 +211,7 @@ class TestDuplicateImageViews(TestCase):
             reverse("wagtailimages:delete", args=(new_image.id,))
             + "?"
             + urlencode(
-                {
-                    "next": reverse(
-                        "wagtailimages:chooser_select_format", args=(existing_image.id,)
-                    )
-                }
+                {"next": reverse(choose_new_image_url, args=(existing_image.id,))}
             )
         )
         self.assertEqual(
