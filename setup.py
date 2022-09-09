@@ -6,7 +6,7 @@ with open("README.md", "r") as fh:
     long_description = fh.read()
 
 install_requires = [
-    "wagtail>=3.0,<4.0",
+    "wagtail>=3.0,<5.0",
     "imagehash",
 ]
 
@@ -23,7 +23,7 @@ setup(
     description="Detect duplicates in the Wagtail images library.",
     long_description=long_description,
     long_description_content_type="text/markdown",
-    author="Tidiane Dia",
+    author="Tidiane Dia, Jacob Topp-Mugglestone",
     author_email="atdia97@gmail.com",
     url="https://github.com/tijani-dia/wagtail-images-deduplicator/",
     project_urls={
