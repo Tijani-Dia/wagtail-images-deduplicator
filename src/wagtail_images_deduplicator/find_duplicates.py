@@ -1,18 +1,35 @@
-from django.db.models import Q
-from wagtail.images import get_image_model
+import typing
 
+from django.db.models import Q, QuerySet
+from imagehash import ImageHash
+from wagtail.images import get_image_model
+from wagtail.images.models import AbstractImage
+
+from .models import DuplicateFindingMixin
 from .utils import get_max_distance_thresold
 
+if typing.TYPE_CHECKING:
+    from django.contrib.auth.models import AbstractUser
+    from wagtail.permission_policies import BasePermissionPolicy
 
-def is_image_duplicate(image_hash, other_image_hash):
+
+def is_image_duplicate(image_hash: ImageHash, other_image_hash: ImageHash) -> bool:
     distance = image_hash - other_image_hash
     return True if distance < get_max_distance_thresold() else False
 
 
-def find_image_duplicates(image, user, permission_policy, first_only=True):
-    instances = permission_policy.instances_user_has_permission_for(
-        user, "choose"
-    ).exclude(pk=image.pk)
+def find_image_duplicates(
+    image: DuplicateFindingMixin,
+    user: "AbstractUser",
+    permission_policy: "BasePermissionPolicy",
+    first_only: bool = True,
+) -> QuerySet[AbstractImage]:
+    instances = typing.cast(
+        QuerySet[AbstractImage],
+        permission_policy.instances_user_has_permission_for(user, "choose").exclude(
+            pk=image.pk
+        ),
+    )
 
     file_hash = image.file_hash
     custom_hash = image.custom_hash
@@ -23,9 +40,9 @@ def find_image_duplicates(image, user, permission_policy, first_only=True):
         if file_hash:
             filters |= Q(file_hash=file_hash)
 
-        duplicates = instances.filter(filters)
-        if duplicates:
-            return duplicates
+        exact_duplicates = instances.filter(filters)
+        if exact_duplicates:
+            return exact_duplicates
 
     elif file_hash:
         # Custom hash isn't set, resort to finding exact duplicates by file hash.
@@ -39,8 +56,11 @@ def find_image_duplicates(image, user, permission_policy, first_only=True):
     # Let's find the near duplicates (if any).
     image_hash = image.hash_instance
 
-    qs = instances.exclude(custom_hash="").only("pk", "custom_hash").iterator()
-    duplicates = []
+    qs = typing.cast(
+        typing.Iterator[DuplicateFindingMixin],
+        (instances.exclude(custom_hash="").only("pk", "custom_hash").iterator()),
+    )
+    duplicates: typing.List[typing.Union[int, str]] = []
     for instance in qs:
         if is_image_duplicate(image_hash, instance.hash_instance):
             if first_only:

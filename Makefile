@@ -7,14 +7,14 @@ clean:
 	rm -rf dist/ build/ .pytest_cache/
 
 format:
-	isort src/wagtail_images_deduplicator tests setup.py
-	black src/wagtail_images_deduplicator tests setup.py
-	flake8 src/wagtail_images_deduplicator tests setup.py
+	isort src/wagtail_images_deduplicator typings tests setup.py
+	black src/wagtail_images_deduplicator typings tests setup.py
+	flake8 src/wagtail_images_deduplicator typings tests setup.py
 
 lint:
-	isort --check-only --diff src/wagtail_images_deduplicator tests setup.py
-	black --check --diff src/wagtail_images_deduplicator tests setup.py
-	flake8 src/wagtail_images_deduplicator tests setup.py
+	isort --check-only --diff src/wagtail_images_deduplicator typings tests setup.py
+	black --check --diff src/wagtail_images_deduplicator typings tests setup.py
+	flake8 src/wagtail_images_deduplicator typings tests setup.py
 
 test:
 	pytest --cov wagtail_images_deduplicator

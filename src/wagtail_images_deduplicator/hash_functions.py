@@ -1,9 +1,11 @@
-HASH_FUNCTIONS = {
+import typing
+
+HASH_FUNCTION = typing.Literal[
     "average_hash",
     "phash",
     "dhash",
     "dhash_vertical",
     "whash",
     "colorhash",
-    "crop_resistant_hash",
-}
+]
+HASH_FUNCTIONS: typing.Tuple[HASH_FUNCTION] = typing.get_args(HASH_FUNCTION)

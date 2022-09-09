@@ -14,7 +14,7 @@ def get_custom_hash_func():
     if hash_func not in HASH_FUNCTIONS:
         raise ImproperlyConfigured(
             f"Unrecognized hash function: {hash_func}.\n"
-            f"Hash function must be one of {HASH_FUNCTIONS}."
+            + f"Hash function must be one of {HASH_FUNCTIONS}."
         )
 
     return getattr(imagehash, hash_func)
@@ -34,5 +34,5 @@ def get_max_distance_thresold():
 
 
 @lru_cache(maxsize=1024)
-def get_imagehash_instance(image_hash):
+def get_imagehash_instance(image_hash: str):
     return imagehash.hex_to_hash(image_hash)

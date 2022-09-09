@@ -1,11 +1,14 @@
+import typing
+
+from django.apps import AppConfig
 from django.core.checks import Warning
 from wagtail.images import get_image_model
 
 
-def check_image_model(app_configs, **kwargs):
+def check_image_model(app_configs: typing.Dict[str, AppConfig], **kwargs: typing.Any):
     from .models import DuplicateFindingMixin
 
-    warnings = []
+    warnings: typing.List[Warning] = []
     ImageModel = get_image_model()
     if not issubclass(ImageModel, DuplicateFindingMixin):
         warnings.append(
